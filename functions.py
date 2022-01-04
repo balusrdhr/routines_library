@@ -172,3 +172,50 @@ def get_mhaloes(fname, snapshot, mass_type = "Mass_FOF"):
         redshift = 1/scale_factor - 1
 
         return mhaloes, boxsize, redshift, little_h
+
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
+def CosmicVarianceError(k, ps, k_edges, L_box):
+   """
+    Compute the cosmic variance errors for a given power spectrum.
+    The formula: Var = Power /sqrt(N) where N is the number modes in the k-bin.
+    A good derivation of the formula is given in Mondal, R., MNRAS 456, 1936–1947 (2016).
+
+    Note: Assumes the volume is cubical. Also what I am computing and returning here is 
+    strictly speaking the standard deviation and not variance. 
+
+    Parameters
+    ----------
+    k : Numpy array
+	Array of k-values. This is the average k-value in the bin. 
+
+    ps : Numpy array
+	Array of power values. This is the average power in the k-bin. 
+
+    k_edges : Numpy array
+	Array of k-values that are the bin-edges in k-space. len(k_edges) = len(k) + 1
+    
+    L_box : float
+	Side_length of the cubical volume.
+
+    Returns
+    -------
+
+    CosmicVariance : Numpy array
+        An array of the cosmic variance errors 
+
+    """
+
+    Dk = np.diff(k_edges) #bin-width
+    N_c = 2*np.pi*k*k*Dk*((L_box/(2*np.pi))**3) #Number of modes in the bin. Note the 2 instead of the 4 in the beginning. Because of FFT of real field.
+    CosmicVariance = P_21/np.sqrt(N_c)
+    
+    return CosmicVariance
+
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
+
