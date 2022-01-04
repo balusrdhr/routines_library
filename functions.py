@@ -80,3 +80,50 @@ def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, quiet
         print(f"Size of the subvolume: {sidelength} Mpc, i.e. the sidelengths are 1/{factor} of the original simulation.")
 
     return subvols, sidelength
+
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
+def check_for_xH(fname, xH_val, tol=0.05):
+    """
+    Check a Meraxes output file for the presence of a particular global xH.
+
+    *Args*:
+        fname : str
+            Full path to input hdf5 master file
+
+        xH_val : float
+            xH value
+
+    *Kwargs*:
+        tol : float
+            +- tolerance on xH value present.  An error will be thrown if
+            no xH within this tollerance is found.
+
+    *Returns*:
+        snapshot : int
+            Closest snapshot
+
+        redshift : float
+            Closest corresponding redshift
+
+        xH : float
+            Neutral fraction of the snapshot
+    """
+
+    snaps, z, _ = meraxes.io.read_snaplist(fname)
+    xH = meraxes.io.read_global_xH(fname, snaps, weight="volume")
+    xHs = xH - xH_val
+
+    w = np.argmin(np.abs(xHs))
+
+    if np.abs(xHs[w]) > tol:
+        raise KeyError("No xH value within tolerance found.")
+
+    return int(snaps[w]), np.round(z[w], 2), np.round(xH[w], 2)
+
+#############################################################################################
+#############################################################################################
+#############################################################################################
+
