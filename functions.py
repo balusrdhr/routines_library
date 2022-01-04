@@ -127,3 +127,48 @@ def check_for_xH(fname, xH_val, tol=0.05):
 #############################################################################################
 #############################################################################################
 
+def get_mhaloes(fname, snapshot, mass_type = "Mass_FOF"):
+    """
+    Return the halo masses. Mostly for making the Halo Mass Functions.
+    Note: VELOCIraptor stores the masses with the little_h factored in.
+    
+    Parameters
+    ----------
+    fname : str
+        Name of the hdf5 file.
+
+    snapshot : int
+        Snapshot value to read in the grid from.
+
+    mass_type : str
+        The mass grid to read in. Choose from {"Mass_tot", "Mass_FOF", "Mass_200mean", "Mass_200crit"}
+        default = "Mass_FOF"
+
+    Returns
+    -------
+
+    mhaloes : Numpy array
+        An array of the requested halo masses. Units: h^-1 M_Sun
+
+    boxsize : float
+        The boxsize of the subvolumes. Units: h^-1 Mpc
+    
+    redshift : float
+    	Redshift value corresponding to the input snapshot
+
+    little_h : float
+    	Value of the little_h where H0 = 100*little_h kim/s/Mpc. Units: Dimensionless
+    """
+    
+    with h5.File(fname, "r") as hf:
+        mass_unit = hf["Header/Units"].attrs["Mass_unit_to_solarmass"]
+        boxsize = hf["Header/Simulation"].attrs["Period"]
+        little_h = hf["Header/Simulation"].attrs["h_val"]
+
+        mhaloes = np.asarray(hf["Snap_{:03d}/{}".format(snapshot, mass_type)])
+        mhaloes = mhaloes * mass_unit * little_h #VELOCIraptor stores the masses with the little_h factored in.
+
+        scale_factor = np.array(hf["Snap_{:03d}".format(snapshot)].attrs["scalefactor"])
+        redshift = 1/scale_factor - 1
+
+        return mhaloes, boxsize, redshift, little_h
