@@ -208,11 +208,11 @@ def CosmicVarianceError(k, ps, k_edges, L_box):
 
     """
 
-    Dk = np.diff(k_edges) #bin-width
-    N_c = 2*np.pi*k*k*Dk*((L_box/(2*np.pi))**3) #Number of modes in the bin. Note the 2 instead of the 4 in the beginning. Because of FFT of real field.
-    CosmicVariance = P_21/np.sqrt(N_c)
+   Dk = np.diff(k_edges) #bin-width
+   N_c = 2*np.pi*k*k*Dk*((L_box/(2*np.pi))**3) #Number of modes in the bin. Note the 2 instead of the 4 in the beginning. Because of FFT of real field.
+   CosmicVariance = P_21/np.sqrt(N_c)
     
-    return CosmicVariance
+   return CosmicVariance
 
 #############################################################################################
 #############################################################################################
