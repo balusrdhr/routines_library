@@ -3,7 +3,7 @@ import h5py as h5
 from dragons import meraxes, munge
 
 
-def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, quiet=True):
+def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, whole_grid = False, quiet=True):
     """
     Split a 3D-grid of values into subvolumes.
 
@@ -25,6 +25,9 @@ def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, quiet
         Whether the returned grid/field should be a fluctuation (zero-mean quantity) or not.
         Obtained by (grid/grid.mean - 1).
         (default = True)
+
+    whole_grid : bool
+        Return the whole grid as well.
 
     Returns
     -------
@@ -74,9 +77,12 @@ def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, quiet
     if fluctuation:
         for ii in np.arange(vol_factor):
             subvols[ii] = subvols[ii]/subvols[ii].mean() - 1
-
+        
         if not quiet:
             print(f"All the grids are now zero-mean quantities, i.e. fluctations in the \"{grid_name}\" field")
+
+    if fluctuation and whole_grid:
+        grid = grid/grid.mean() - 1
 
     boxlength = meraxes.read_input_params(fname)["BoxSize"]
     sidelength = boxlength/factor
@@ -85,8 +91,11 @@ def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, quiet
 
         print(f"BoxSize of the full simulation: {boxlength} Mpc")
         print(f"Size of the subvolume: {sidelength} Mpc, i.e. the sidelengths are 1/{factor} of the original simulation.")
-
-    return subvols, sidelength
+    
+    if whole_grid:
+        return subvols, sidelength, grid
+    else:
+        return subvols, sidelength
 
 #############################################################################################
 #############################################################################################
