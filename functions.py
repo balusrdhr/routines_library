@@ -1,7 +1,7 @@
 import numpy as np
 import h5py as h5
 from dragons import meraxes, munge
-
+import astropy.units as u, astropy.constants as C
 
 def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, whole_grid = False, quiet=True):
     """
@@ -98,9 +98,6 @@ def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, whole
     else:
         return subvols, sidelength
 
-#############################################################################################
-#############################################################################################
-#############################################################################################
 
 def check_for_xH(fname, xH_val, tol=0.05):
     """
@@ -140,9 +137,6 @@ def check_for_xH(fname, xH_val, tol=0.05):
 
     return int(snaps[w]), np.round(z[w], 2), np.round(xH[w], 2)
 
-#############################################################################################
-#############################################################################################
-#############################################################################################
 
 def get_mhaloes(fname, snapshot, mass_type = "Mass_FOF"):
     """
@@ -190,9 +184,6 @@ def get_mhaloes(fname, snapshot, mass_type = "Mass_FOF"):
 
         return mhaloes, boxsize, redshift, little_h
 
-#############################################################################################
-#############################################################################################
-#############################################################################################
 
 def CosmicVarianceError(k, ps, k_edges, L_box):
    """
@@ -231,8 +222,37 @@ def CosmicVarianceError(k, ps, k_edges, L_box):
     
    return CosmicVariance
 
-#############################################################################################
-#############################################################################################
-#############################################################################################
 
+def Mags_to_Q(Mags, lambda_1 = 912, lambda_2 = 91, ):
+   """
+    Convert the LyC magnitude values from Meraxes to the ionising photon flux Q
 
+    Note: 
+
+    Parameters
+    ----------
+    Mags : Numpy array
+	Array of Mags-values. 
+
+    lambda_1 : float
+    Lyman limit wavelength. (Default: 912 nm)
+	Units doesn't matter as long as it is the same as lambda_2
+
+    lambda_2 : float
+    SED smallest wavelength. (Default: 91 nm)
+	Units doesn't matter as long as it is the same as lambda_1
+    
+   Returns
+   -------
+
+   Q : Numpy array
+   Array of ionising photon flux
+
+   """
+
+   f_n = 10**( (22.5 - mags) / 2.5) * 3.632e3 * u.nJy 
+   f_n = np.float64(f_n).to(u.erg/u.s/u.cm**2/u.Hz)
+   f_n = f_n * np.log(lambda1/lambda2)/ C.h.to(u.erg/u.Hz)
+   f_n = f_n * 4 * np.pi * ( (10 * u.pc).to(u.cm) )**2
+
+   return f_n
