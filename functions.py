@@ -59,7 +59,8 @@ def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, whole
     subvols = np.asarray(subvols, dtype=object)
 
     arr_shape = int(grid.shape[0]/factor)
-    ##Black Magic!! Took me a solid couple of hours to test and figure out. SHOULD work!
+
+    ### Black Magic!! Took me a solid couple of hours to test and figure out. SHOULD work! ###
     for ii in np.arange(vol_factor):
 
         if subvols[ii].shape[2] > arr_shape:
@@ -72,7 +73,7 @@ def subvolumes(fname, snapshot, grid_name, vol_factor, fluctuation = True, whole
             subvols[ii] = np.delete(subvols[ii], 2, axis=0)
 
     if not quiet:
-        print(f"Each subvolume have the shape {subvols[0].shape}")
+        print(f"Each subvolume has the shape {subvols[0].shape}")
 
     if fluctuation:
         for ii in np.arange(vol_factor):
