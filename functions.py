@@ -176,6 +176,8 @@ def get_mhaloes(fname, snapshot, mass_type = "Mass_FOF"):
         boxsize = hf["Header/Simulation"].attrs["Period"]
         little_h = hf["Header/Simulation"].attrs["h_val"]
 
+        print(mass_unit, little_h)
+
         mhaloes = np.asarray(hf["Snap_{:03d}/{}".format(snapshot, mass_type)])
         mhaloes = mhaloes * mass_unit * little_h #VELOCIraptor stores the masses with the little_h factored in.
 
